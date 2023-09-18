@@ -12,17 +12,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @SecurityScheme(
         name = "JWT",
-        type = SecuritySchemeType.APIKEY,
-        scheme = "basic"
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT"
 )
 @OpenAPIDefinition(
         info = @Info(
                 title = "Calendar API documentation",
                 version = "1.0",
-                description = """
-                        <p><b>Test credentials:</b><br>
-                        - admin / admin
-                        - user2 / password
+                description =
+                        """
+                                <p><b>Test credentials:</b><br>
+                                - admin@admin.com / admin<br>
+                                - user2@example.com / password
                         """
         ),
         security = @SecurityRequirement(name = "JWT")

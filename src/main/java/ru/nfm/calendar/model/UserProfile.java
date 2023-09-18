@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "user_profile")
@@ -40,6 +40,19 @@ public class UserProfile {
     @Column(name = "position", length = 128)
     private String position;
 
+    @Column(name = "telegram_chat_id")
+    private long telegramChatId;
+
+    @Column(name = "time_zone")
+    private String timezone;
+
     @OneToMany(fetch = FetchType.LAZY)
-    private Set<Calendar> createdCalendars;
+    private List<Calendar> createdCalendars;
+
+    @ManyToMany
+    @JoinTable(name = "calendar_event_user",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "calendar_event_id")
+    )
+    private List<CalendarEvent> attachedEvents;
 }

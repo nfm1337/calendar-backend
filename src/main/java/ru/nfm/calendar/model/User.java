@@ -9,6 +9,7 @@ import org.hibernate.proxy.HibernateProxy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
@@ -32,15 +33,21 @@ public class User implements UserDetails {
     @PrimaryKeyJoinColumn
     private UserProfile userProfile;
 
-    @Column(name = "login", unique = true, nullable = false, length = 64)
-    private String login;
-
     @Column(name = "email", unique = true, nullable = false, length = 128)
     private String email;
 
     @Column(name = "password", nullable = false)
     @JsonIgnore
     private String password;
+
+    @Column(name = "registered_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    @Setter(AccessLevel.NONE)
+    private Instant registeredAt;
+
+    @Column(name = "invalidate_token_before", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Instant invalidateTokenBefore;
 
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_role",
@@ -52,7 +59,6 @@ public class User implements UserDetails {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<UserRole> roles;
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles;
@@ -60,7 +66,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return login;
+        return email;
     }
 
     @Override

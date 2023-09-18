@@ -21,6 +21,9 @@ public class Attachment {
     @JoinColumn(name = "calendar_event_id")
     private CalendarEvent calendarEvent;
 
+    @Column(name = "title")
+    private String title;
+
     @Column(name = "url")
     private String url;
 }

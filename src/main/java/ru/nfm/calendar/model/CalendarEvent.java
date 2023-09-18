@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.Set;
+import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "calendar_event")
@@ -32,21 +32,23 @@ public class CalendarEvent {
     private String description;
 
     @Column(name = "time_from")
-    private LocalDateTime timeFrom;
+    private Instant timeFrom;
 
     @Column(name = "time_to")
-    private LocalDateTime timeTo;
+    private Instant timeTo;
 
     @Column(name = "notification_time")
-    private LocalDateTime notificationTime;
+    private Instant notificationTime;
 
     @Column(name = "is_blocking")
     private Boolean isBlocking;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Calendar calendar;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<Attachment> attachments;
+    private List<Attachment> attachments;
 
     @ManyToMany
-    @JoinTable(name = "calendar_event_user")
-    private Set<UserProfile> attachedUsers;
+    private List<UserProfile> attachedUsers;
 }

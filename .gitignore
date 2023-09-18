@@ -5,7 +5,6 @@ target/
 !**/src/test/**/target/
 /flyway.conf
 
-
 ### STS ###
 .apt_generated
 .classpath

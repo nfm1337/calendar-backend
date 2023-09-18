@@ -1,5 +1,6 @@
-package ru.nfm.calendar.dto.auth.response;
+package ru.nfm.calendar.payload.response;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,5 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class JwtAuthenticationResponse {
 
-    private String token;
+    @NotBlank
+    private String accessToken;
+
+    @NotBlank
+    private String refreshToken;
 }

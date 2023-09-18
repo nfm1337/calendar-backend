@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "calendar")
@@ -30,9 +30,13 @@ public class Calendar {
     @Column(name = "title", length = 256, nullable = false)
     private String title;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "color", length = 256, nullable = false)
-    private String color;
+    private CalendarColor color;
 
     @OneToMany
-    private Set<CalendarEvent> events;
+    private List<CalendarEvent> events;
+
+    @OneToMany
+    private List<CalendarUser> calendarUsers;
 }

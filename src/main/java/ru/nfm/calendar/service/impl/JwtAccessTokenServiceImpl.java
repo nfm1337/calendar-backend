@@ -8,7 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import ru.nfm.calendar.service.JwtService;
+import ru.nfm.calendar.service.JwtAccessTokenService;
 
 import java.security.Key;
 import java.util.Date;
@@ -17,10 +17,13 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
-public class JwtServiceImpl implements JwtService {
+public class JwtAccessTokenServiceImpl implements JwtAccessTokenService {
 
     @Value("${jwt.secret}")
     private String jwtSigningKey;
+
+    @Value("${jwt.accessToken.expiration}")
+    private long jwtExpirationTimeMillis;
 
     @Override
     public String extractUsername(String token) {
@@ -28,7 +31,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String generateToken(UserDetails userDetails) {
+    public String generateAccessToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
 
@@ -44,9 +47,10 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
+        return Jwts.builder().setClaims(extraClaims)
+                .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationTimeMillis))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
     }
 
