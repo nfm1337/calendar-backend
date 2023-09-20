@@ -23,6 +23,7 @@ import ru.nfm.calendar.service.JwtRefreshTokenService;
 
 import java.time.Instant;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -39,52 +40,58 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public JwtAuthenticationResponse signUp(SignUpRequest request) {
         var user = User.builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .email(request.email())
+                .password(passwordEncoder.encode(request.password()))
                 .registeredAt(Instant.now())
                 .invalidateTokenBefore(Instant.now())
-                .roles(Set.of(UserRole.USER))
+                .isEmailConfirmed(false)
+                .emailConfirmationToken(generateEmailConfirmationToken())
+                .roles(Set.of(UserRole.EMAIL_NOT_CONFIRMED))
                 .build();
 
         userRepository.save(user);
         var jwtAccessToken = jwtAccessTokenService.generateAccessToken(user);
         var jwtRefreshToken = jwtRefreshTokenService.createRefreshToken(user.getId());
 
-        return JwtAuthenticationResponse.builder()
-                .accessToken(jwtAccessToken)
-                .refreshToken(jwtRefreshToken.getToken())
-                .build();
+        return new JwtAuthenticationResponse(jwtAccessToken, jwtRefreshToken.getToken());
     }
 
     @Override
     public JwtAuthenticationResponse signIn(SignInRequest request) {
         log.debug("SignIn Request: " + request);
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-        var user = userRepository.findByEmail(request.getEmail())
+                new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+        var user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new UsernameNotFoundException("Invalid email or password"));
         var jwtAccessToken = jwtAccessTokenService.generateAccessToken(user);
         var jwtRefreshToken = jwtRefreshTokenService.createRefreshToken(user.getId());
 
-        return JwtAuthenticationResponse.builder()
-                .accessToken(jwtAccessToken)
-                .refreshToken(jwtRefreshToken.getToken())
-                .build();
+        return new JwtAuthenticationResponse(jwtAccessToken, jwtRefreshToken.getToken());
     }
 
     @Override
     public JwtAuthenticationResponse refreshToken(RefreshTokenRequest request) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(request.getRefreshToken())
-                .orElseThrow(() -> new TokenRefreshException(request.getRefreshToken(), "Refresh token not found"));
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(request.refreshToken())
+                .orElseThrow(() -> new TokenRefreshException(request.refreshToken(), "Refresh token not found"));
         jwtRefreshTokenService.verifyExpiration(refreshToken);
         User user = userRepository.findById(refreshToken.getUser().getId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         var jwtAccessToken = jwtAccessTokenService.generateAccessToken(user);
         var jwtRefreshToken = jwtRefreshTokenService.createRefreshToken(user.getId());
 
-        return JwtAuthenticationResponse.builder()
-                .accessToken(jwtAccessToken)
-                .refreshToken(jwtRefreshToken.getToken())
-                .build();
+        return new JwtAuthenticationResponse(jwtAccessToken, jwtRefreshToken.getToken());
+    }
+
+    @Override
+    public void logOutFromAllDevices(String token) {
+        String username = jwtAccessTokenService.extractUsername(token);
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        user.setInvalidateTokenBefore(Instant.now());
+        refreshTokenRepository.deleteByUser(user);
+    }
+
+    private String generateEmailConfirmationToken() {
+        return UUID.randomUUID().toString();
     }
 }

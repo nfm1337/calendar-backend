@@ -4,7 +4,7 @@ import ru.nfm.calendar.model.RefreshToken;
 
 public interface JwtRefreshTokenService {
 
-    RefreshToken createRefreshToken(Long userId);
+    RefreshToken createRefreshToken(int userId);
 
     RefreshToken verifyExpiration(RefreshToken refreshToken);
 }

@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,9 @@ public class JwtAccessTokenServiceImpl implements JwtAccessTokenService {
 
     @Override
     public String generateAccessToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("roles", StringUtils.join(userDetails.getAuthorities(), ","));
+        return generateToken(claims, userDetails);
     }
 
     @Override
@@ -47,7 +50,10 @@ public class JwtAccessTokenServiceImpl implements JwtAccessTokenService {
     }
 
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return Jwts.builder().setClaims(extraClaims)
+        return Jwts.builder()
+                .setClaims(extraClaims)
+                .setHeaderParam("alg", "HS256")
+                .setHeaderParam("typ", "JWT")
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationTimeMillis))

@@ -13,4 +13,5 @@ public interface AuthenticationService {
 
     JwtAuthenticationResponse refreshToken(RefreshTokenRequest request);
 
+    void logOutFromAllDevices(String token);
 }
