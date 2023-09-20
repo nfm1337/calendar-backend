@@ -35,7 +35,7 @@ public class OpenApiConfig {
     public GroupedOpenApi api() {
         return GroupedOpenApi.builder()
                 .group("REST API")
-                .pathsToMatch("/api/v1/**")
+                .pathsToMatch("/**")
                 .build();
     }
 }
