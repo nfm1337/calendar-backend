@@ -19,7 +19,7 @@ public class CalendarEvent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id")
@@ -49,6 +49,6 @@ public class CalendarEvent {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Attachment> attachments;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<UserProfile> attachedUsers;
 }

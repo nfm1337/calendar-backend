@@ -1,10 +1,7 @@
 package ru.nfm.calendar.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -14,34 +11,32 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class UserProfile {
 
     @Id
-    @Column(name = "id")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
+    @OneToOne(cascade = CascadeType.ALL, optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "id", referencedColumnName = "id")
     @MapsId
     private User user;
 
-    @Column(name = "first_name", nullable = false, length = 64)
+    @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false, length = 64)
+    @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
-    @Column(name = "sur_name", length = 64)
+    @Column(name = "sur_name", length = 50)
     private String surName;
 
-    @Column(name = "company_name", length = 256)
+    @Column(name = "company_name", length = 100)
     private String companyName;
 
-    @Column(name = "position", length = 128)
+    @Column(name = "position", length = 50)
     private String position;
-
-    @Column(name = "telegram_chat_id")
-    private long telegramChatId;
 
     @Column(name = "time_zone")
     private String timezone;

@@ -15,7 +15,7 @@ import lombok.Setter;
 public class Attachment {
 
     @Id
-    private Long id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "calendar_event_id")

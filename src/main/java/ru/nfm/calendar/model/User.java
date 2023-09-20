@@ -2,6 +2,9 @@ package ru.nfm.calendar.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -26,15 +29,22 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    private Integer id;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
     private UserProfile userProfile;
 
+    @Email
+    @NotBlank
+    @Size(max = 128)
     @Column(name = "email", unique = true, nullable = false, length = 128)
     private String email;
+
+    @Column(name = "is_email_confirmed")
+    private Boolean isEmailConfirmed;
+
+    @Column(name = "email_confirmation_token")
+    private String emailConfirmationToken;
 
     @Column(name = "password", nullable = false)
     @JsonIgnore
