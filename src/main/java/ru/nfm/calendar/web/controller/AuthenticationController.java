@@ -1,8 +1,8 @@
 package ru.nfm.calendar.web.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,11 +16,11 @@ import ru.nfm.calendar.payload.response.JwtAuthenticationResponse;
 import ru.nfm.calendar.service.AuthenticationService;
 
 @RestController
-@RequestMapping(path = "/api/v1/auth", consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = AuthenticationController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @AllArgsConstructor
-@Slf4j
 public class AuthenticationController {
 
+    static final String REST_URL = "/auth";
     private final AuthenticationService authenticationService;
 
     @PostMapping("/sign-up")
@@ -30,17 +30,17 @@ public class AuthenticationController {
 
     @PostMapping("/sign-in")
     public ResponseEntity<JwtAuthenticationResponse> signIn(@Valid @RequestBody SignInRequest request) {
-        log.debug("SignIn: " + request);
         return ResponseEntity.ok(authenticationService.signIn(request));
-    }
-
-    @PostMapping("/sign-out")
-    public ResponseEntity<String> signOut() {
-        return ResponseEntity.ok("Logged out");
     }
 
     @PostMapping("/refresh-token")
     public ResponseEntity<JwtAuthenticationResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
         return ResponseEntity.ok(authenticationService.refreshToken(request));
+    }
+
+    @PostMapping("/log-out")
+    public ResponseEntity<String> logoutFromAllDevices(HttpServletRequest request) {
+        authenticationService.logOutFromAllDevices(request.getHeader("Authorization").substring(7));
+        return ResponseEntity.ok("Logged out successfully");
     }
 }
