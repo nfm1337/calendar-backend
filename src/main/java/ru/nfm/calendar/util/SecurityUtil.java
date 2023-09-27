@@ -14,4 +14,8 @@ public class SecurityUtil {
         Authentication authentication = securityContext.getAuthentication();
         return (UserDetails) authentication.getPrincipal();
     }
+
+    public static String getUserEmail() {
+        return getUserDetails().getUsername();
+    }
 }

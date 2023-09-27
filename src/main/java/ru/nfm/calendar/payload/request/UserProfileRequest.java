@@ -16,7 +16,6 @@ public record UserProfileRequest(
         String companyName,
         @Size(max = 50, message = "Должность не должна быть длиннее 50 символов")
         String position,
-        String telegramLink,
         String timezone
 ) {
 }
