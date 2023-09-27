@@ -49,6 +49,7 @@ public class CalendarServiceImpl implements CalendarService {
         calendarUser.setUserProfile(userProfile);
         calendarUser.setCalendar(calendar);
         calendarUser.setCalendarRole(CalendarRole.CREATOR);
+        calendarUser.setIsCalendarActive(true);
 
         calendarUserRepository.save(calendarUser);
 

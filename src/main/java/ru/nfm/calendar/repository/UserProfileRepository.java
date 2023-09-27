@@ -17,7 +17,7 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
     @Query("SELECT up FROM UserProfile up JOIN FETCH User u WHERE u.id = :id")
     Optional<UserProfile> findById(int id);
 
-    @Query("SELECT up FROM UserProfile up JOIN FETCH User u WHERE u.email = :email")
+    @Query("SELECT up FROM UserProfile up JOIN User u ON u.id = up.id WHERE u.email = :email")
     Optional<UserProfile> findByEmail(String email);
 
     @Query("SELECT NEW ru.nfm.calendar.dto.UserProfileDto(u.email, up) FROM UserProfile up JOIN User u WHERE u.email = :email")

@@ -38,10 +38,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "id")
-    @ToString.Exclude
+    @OneToOne(mappedBy = "user")
     private UserProfile userProfile;
 
     @Email

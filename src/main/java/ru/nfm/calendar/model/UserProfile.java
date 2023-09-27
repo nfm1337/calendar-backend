@@ -17,9 +17,13 @@ import java.util.Objects;
 public class UserProfile {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne(mappedBy = "userProfile", optional = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "id")
+    @ToString.Exclude
     private User user;
 
     @Column(name = "first_name", nullable = false, length = 50)

@@ -18,6 +18,7 @@ import ru.nfm.calendar.payload.request.SignInRequest;
 import ru.nfm.calendar.payload.request.SignUpRequest;
 import ru.nfm.calendar.payload.response.JwtAuthenticationResponse;
 import ru.nfm.calendar.repository.RefreshTokenRepository;
+import ru.nfm.calendar.repository.UserProfileRepository;
 import ru.nfm.calendar.repository.UserRepository;
 import ru.nfm.calendar.service.AuthenticationService;
 import ru.nfm.calendar.service.JwtAccessTokenService;
@@ -33,6 +34,7 @@ import java.util.UUID;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtAccessTokenService jwtAccessTokenService;
@@ -40,6 +42,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     @Override
+    @Transactional
     public JwtAuthenticationResponse signUp(SignUpRequest request) {
         checkEmailAlreadyExists(request.email());
 
@@ -53,7 +56,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .roles(Set.of(UserRole.EMAIL_NOT_CONFIRMED))
                 .build();
 
-        userRepository.save(user);
+        user = userRepository.save(user);
+
         var jwtAccessToken = jwtAccessTokenService.generateAccessToken(user);
         var jwtRefreshToken = jwtRefreshTokenService.createRefreshToken(user);
 

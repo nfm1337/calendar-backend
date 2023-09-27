@@ -29,7 +29,8 @@ public class UserProfileServiceImpl implements UserProfileService {
         String email = SecurityUtil.getUserEmail();
         User user = userRepository.getExistedByEmail(email);
 
-        UserProfile userProfile = user.getUserProfile();
+        UserProfile userProfile = new UserProfile();
+        userProfile.setUser(user);
         userProfile.setFirstName(request.firstName());
         userProfile.setLastName(request.lastName());
         userProfile.setSurName(request.surName());
@@ -43,6 +44,15 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Override
     @Transactional
     public UserProfileDto updateUserProfile(UserProfileRequest request) {
-        return userProfileMapper.toDto(setupUserProfile(request));
+        String email = SecurityUtil.getUserEmail();
+        UserProfile userProfile = userProfileRepository.getExistedByEmail(email);
+        userProfile.setFirstName(request.firstName());
+        userProfile.setLastName(request.lastName());
+        userProfile.setSurName(request.surName());
+        userProfile.setCompanyName(request.companyName());
+        userProfile.setPosition(request.position());
+        userProfile.setTimezone(request.timezone());
+
+        return userProfileMapper.toDto(userProfileRepository.save(userProfile));
     }
 }
