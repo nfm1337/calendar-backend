@@ -19,7 +19,6 @@ import ru.nfm.calendar.service.AuthenticationService;
 @RequestMapping(value = AuthenticationController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @AllArgsConstructor
 public class AuthenticationController {
-
     static final String REST_URL = "/auth";
     private final AuthenticationService authenticationService;
 
@@ -40,7 +39,8 @@ public class AuthenticationController {
 
     @PostMapping("/log-out")
     public ResponseEntity<String> logoutFromAllDevices(HttpServletRequest request) {
-        authenticationService.logOutFromAllDevices(request.getHeader("Authorization").substring(7));
+        String token = request.getHeader("Authorization").substring(7);
+        authenticationService.logOutFromAllDevices(token);
         return ResponseEntity.ok("Logged out successfully");
     }
 }
