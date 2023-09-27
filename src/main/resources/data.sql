@@ -18,9 +18,9 @@ VALUES (1, 'John', 'Doe', 'Sr.', 'Acme Inc.', 'Software Engineer',  'America/New
 
 -- Insert sample calendars
 INSERT INTO calendar (creator_id, title, color)
-VALUES (1, 'Personal Calendar', 'blue'),
-       (1, 'Work Calendar', 'green'),
-       (2, 'Team Calendar', 'red');
+VALUES (1, 'Personal Calendar', 'BLUE'),
+       (1, 'Work Calendar', 'GREEN'),
+       (2, 'Team Calendar', 'RED');
 
 -- Insert sample calendar events
 INSERT INTO calendar_event (calendar_id, creator_id, title, description, time_from, time_to, notification_time, is_blocking)
@@ -29,11 +29,11 @@ VALUES (1, 1, 'Meeting', 'Discuss project updates', '2023-09-20 14:00:00', '2023
        (3, 2, 'Team Meeting', 'Weekly team meeting', '2023-09-22 09:00:00', '2023-09-22 10:30:00', '2023-09-22 08:30:00', true);
 
 -- Insert sample calendar users
-INSERT INTO calendar_user (user_id, calendar_id, role)
-VALUES (1, 1, 'CREATOR'),
-       (1, 2, 'CREATOR'),
-       (2, 3, 'USER'),
-       (3, 2, 'USER');
+INSERT INTO calendar_user (user_id, calendar_id, role, is_calendar_active)
+VALUES (1, 1, 'CREATOR', true),
+       (1, 2, 'CREATOR', false),
+       (2, 3, 'USER', true),
+       (3, 2, 'USER', true);
 
 -- Insert sample attachments
 INSERT INTO attachment (calendar_event_id, title, url)

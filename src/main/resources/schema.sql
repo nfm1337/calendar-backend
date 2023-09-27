@@ -21,13 +21,13 @@ CREATE TABLE user_role
 
 CREATE TABLE user_profile
 (
-    id               INTEGER PRIMARY KEY,
-    first_name       VARCHAR(64),
-    last_name        VARCHAR(64),
-    sur_name         VARCHAR(64),
-    company_name     VARCHAR(256),
-    position         VARCHAR(128),
-    time_zone        VARCHAR(64)
+    id           INTEGER PRIMARY KEY,
+    first_name   VARCHAR(64) NOT NULL,
+    last_name    VARCHAR(64) NOT NULL,
+    sur_name     VARCHAR(64),
+    company_name VARCHAR(256),
+    position     VARCHAR(128),
+    time_zone    VARCHAR(64)
 );
 
 CREATE TABLE refresh_token
@@ -61,9 +61,10 @@ CREATE TABLE calendar_event
 
 CREATE TABLE calendar_user
 (
-    user_id     INTEGER,
-    calendar_id INTEGER,
-    role        VARCHAR,
+    user_id            INTEGER,
+    calendar_id        INTEGER,
+    role               VARCHAR,
+    is_calendar_active BOOLEAN DEFAULT true,
     PRIMARY KEY (user_id, calendar_id)
 );
 
