@@ -23,7 +23,7 @@ public class UserProfileController {
     @PostMapping
     public ResponseEntity<UserProfileSetupResponse> createUserProfile(@Valid @RequestBody UserProfileRequest request) {
         UserProfile userProfile = userProfileService.setupUserProfile(request);
-        UserProfileSetupResponse response = new UserProfileSetupResponse(
+        var response = new UserProfileSetupResponse(
                 "Регистрация завершена успешно",
                 userProfile.getId(),
                 userProfile.getUser().getEmail());
@@ -31,7 +31,7 @@ public class UserProfileController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping
+    @PutMapping
     public ResponseEntity<UserProfileUpdateResponse> updateUserProfile(@Valid @RequestBody UserProfileRequest request) {
         var response = new UserProfileUpdateResponse(
                 "Обновление профиля завершено успешно",
