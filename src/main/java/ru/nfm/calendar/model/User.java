@@ -1,11 +1,12 @@
 package ru.nfm.calendar.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.proxy.HibernateProxy;
@@ -25,13 +26,21 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@NamedEntityGraph(name = "User.withUserProfileAndRoles",
+        attributeNodes = {
+                @NamedAttributeNode(value = "userProfile"),
+                @NamedAttributeNode(value = "roles")
+        }
+)
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "id", referencedColumnName = "id")
+    @ToString.Exclude
     private UserProfile userProfile;
 
     @Email
@@ -47,7 +56,7 @@ public class User implements UserDetails {
     private String emailConfirmationToken;
 
     @Column(name = "password", nullable = false)
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(name = "registered_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -68,6 +77,13 @@ public class User implements UserDetails {
     @JoinColumn
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<UserRole> roles;
+
+    public UserProfile getUserProfile() {
+        if (userProfile instanceof HibernateProxy) {
+            return (UserProfile) Hibernate.unproxy(userProfile);
+        }
+        return userProfile;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -1,12 +1,12 @@
 package ru.nfm.calendar.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class CalendarEvent {
 
     @Id
@@ -46,9 +47,20 @@ public class CalendarEvent {
     @ManyToOne(fetch = FetchType.LAZY)
     private Calendar calendar;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Attachment> attachments;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "calendar_event_user",
+            joinColumns = @JoinColumn(name = "calendar_event_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @ManyToMany(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<UserProfile> attachedUsers;
+
+    public void addAttachedUser(UserProfile userProfile) {
+        if (attachedUsers == null) {
+            attachedUsers = new ArrayList<>();
+        }
+        attachedUsers.add(userProfile);
+    }
 }

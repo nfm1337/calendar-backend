@@ -17,15 +17,18 @@ public class CalendarUser {
     @EmbeddedId
     private CalendarUserKey id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
     @JoinColumn(name = "user_id")
-    private UserProfile user;
+    private UserProfile userProfile;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("calendarId")
     @JoinColumn(name = "calendar_id")
     private Calendar calendar;
+
+    @Column(name = "is_calendar_active")
+    private Boolean isCalendarActive;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")

@@ -32,9 +32,11 @@ public class Calendar {
     @Column(name = "color", length = 256, nullable = false)
     private CalendarColor color;
 
-    @OneToMany
+    @OneToMany(mappedBy = "calendar", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<CalendarEvent> events;
 
-    @OneToMany
+    @OneToMany(mappedBy = "calendar", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<CalendarUser> calendarUsers;
 }

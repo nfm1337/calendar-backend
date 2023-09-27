@@ -2,8 +2,10 @@ package ru.nfm.calendar.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "user_profile")
@@ -18,8 +20,8 @@ public class UserProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "userProfile",cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "id")
     @MapsId
     private User user;
 
@@ -42,7 +44,8 @@ public class UserProfile {
     private String timezone;
 
     @OneToMany(fetch = FetchType.LAZY)
-    private List<Calendar> createdCalendars;
+    @JoinColumn(name = "user_id")
+    private List<CalendarUser> calendarUserList;
 
     @ManyToMany
     @JoinTable(name = "calendar_event_user",
@@ -50,4 +53,20 @@ public class UserProfile {
             inverseJoinColumns = @JoinColumn(name = "calendar_event_id")
     )
     private List<CalendarEvent> attachedEvents;
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        UserProfile that = (UserProfile) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
 }
