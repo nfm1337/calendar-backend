@@ -22,9 +22,9 @@ import org.springframework.context.annotation.Configuration;
                 version = "1.0",
                 description =
                         """
-                                <p><b>Test credentials:</b><br>
-                                - admin@admin.com / admin<br>
-                                - user2@example.com / password
+                                Test credentials:
+                                - user1@example.com / password1 - ADMIN ROLE
+                                - user2@example.com / password2 - USER ROLE
                         """
         ),
         security = @SecurityRequirement(name = "JWT")
