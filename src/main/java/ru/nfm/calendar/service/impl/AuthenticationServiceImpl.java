@@ -7,15 +7,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.nfm.calendar.exception.EmailAlreadyExistsException;
 import ru.nfm.calendar.exception.TokenRefreshException;
 import ru.nfm.calendar.model.RefreshToken;
+import ru.nfm.calendar.model.User;
+import ru.nfm.calendar.model.UserRole;
 import ru.nfm.calendar.payload.request.RefreshTokenRequest;
 import ru.nfm.calendar.payload.request.SignInRequest;
 import ru.nfm.calendar.payload.request.SignUpRequest;
 import ru.nfm.calendar.payload.response.JwtAuthenticationResponse;
-import ru.nfm.calendar.model.User;
-import ru.nfm.calendar.model.UserRole;
 import ru.nfm.calendar.repository.RefreshTokenRepository;
 import ru.nfm.calendar.repository.UserRepository;
 import ru.nfm.calendar.service.AuthenticationService;
@@ -54,19 +55,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         userRepository.save(user);
         var jwtAccessToken = jwtAccessTokenService.generateAccessToken(user);
-        var jwtRefreshToken = jwtRefreshTokenService.createRefreshToken(user.getId());
+        var jwtRefreshToken = jwtRefreshTokenService.createRefreshToken(user);
 
         return new JwtAuthenticationResponse(jwtAccessToken, jwtRefreshToken.getToken());
     }
 
     @Override
+    @Transactional
     public JwtAuthenticationResponse signIn(SignInRequest request) {
         log.debug("SignIn Request: " + request);
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         var user = userRepository.getExistedByEmail(request.email());
         var jwtAccessToken = jwtAccessTokenService.generateAccessToken(user);
-        var jwtRefreshToken = jwtRefreshTokenService.createRefreshToken(user.getId());
+        var jwtRefreshToken = jwtRefreshTokenService.createRefreshToken(user);
 
         return new JwtAuthenticationResponse(jwtAccessToken, jwtRefreshToken.getToken());
     }
@@ -79,7 +81,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User user = userRepository.findById(refreshToken.getUser().getId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         var jwtAccessToken = jwtAccessTokenService.generateAccessToken(user);
-        var jwtRefreshToken = jwtRefreshTokenService.createRefreshToken(user.getId());
+        var jwtRefreshToken = jwtRefreshTokenService.createRefreshToken(user);
 
         return new JwtAuthenticationResponse(jwtAccessToken, jwtRefreshToken.getToken());
     }

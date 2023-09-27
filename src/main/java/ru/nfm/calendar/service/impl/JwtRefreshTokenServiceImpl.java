@@ -5,11 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.nfm.calendar.exception.TokenRefreshException;
-import ru.nfm.calendar.exception.UserNotFoundException;
 import ru.nfm.calendar.model.RefreshToken;
 import ru.nfm.calendar.model.User;
 import ru.nfm.calendar.repository.RefreshTokenRepository;
-import ru.nfm.calendar.repository.UserRepository;
 import ru.nfm.calendar.service.JwtRefreshTokenService;
 
 import java.time.Instant;
@@ -22,14 +20,10 @@ public class JwtRefreshTokenServiceImpl implements JwtRefreshTokenService {
     @Value("${jwt.refreshToken.expiration}")
     private long jwtRefreshTokenExpirationTimeMillis;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final UserRepository userRepository;
 
     @Override
     @Transactional
-    public RefreshToken createRefreshToken(int userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId, "User not found"));
-
+    public RefreshToken createRefreshToken(User user) {
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)
                 .expiresAt(Instant.now().plusMillis(jwtRefreshTokenExpirationTimeMillis))

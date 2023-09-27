@@ -17,12 +17,9 @@ import java.util.Objects;
 public class UserProfile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne(mappedBy = "userProfile",cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "id")
-    @MapsId
+    @OneToOne(mappedBy = "userProfile", optional = false)
     private User user;
 
     @Column(name = "first_name", nullable = false, length = 50)
