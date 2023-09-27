@@ -9,6 +9,4 @@ public interface UserProfileService {
     UserProfile setupUserProfile(UserProfileRequest request);
 
     UserProfileDto updateUserProfile(UserProfileRequest request);
-
-    UserProfileDto getUserProfileWithEmail(int id);
 }

@@ -29,6 +29,7 @@ public class JwtRefreshTokenServiceImpl implements JwtRefreshTokenService {
     public RefreshToken createRefreshToken(int userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId, "User not found"));
+
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)
                 .expiresAt(Instant.now().plusMillis(jwtRefreshTokenExpirationTimeMillis))
