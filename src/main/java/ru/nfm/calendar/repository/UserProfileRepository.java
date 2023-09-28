@@ -12,16 +12,19 @@ import java.util.Optional;
 
 @Repository
 @Transactional(readOnly = true)
-public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
+public interface UserProfileRepository extends JpaRepository<UserProfile, Integer> {
 
-    @Query("SELECT up FROM UserProfile up JOIN FETCH User u WHERE u.id = :id")
+    @Query("SELECT up FROM UserProfile up WHERE up.id = :id")
     Optional<UserProfile> findById(int id);
 
-    @Query("SELECT up FROM UserProfile up JOIN User u ON u.id = up.id WHERE u.email = :email")
+    @Query("SELECT up FROM UserProfile up LEFT JOIN FETCH up.calendarUserList cu LEFT JOIN FETCH cu.calendar WHERE up.id = :id")
+    Optional<UserProfile> findByIdWithCalendarUsers(int id);
+
+    @Query("SELECT up FROM UserProfile up WHERE up.user.email = :email")
     Optional<UserProfile> findByEmail(String email);
 
     @Query("SELECT NEW ru.nfm.calendar.dto.UserProfileDto(u.email, up) FROM UserProfile up JOIN User u WHERE u.email = :email")
-    Optional<UserProfileDto> findByEmailWithUserProfile(String email);
+    Optional<UserProfileDto> findDtoByEmail(String email);
 
     default UserProfile getExistedByEmail(String email) {
         return findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found"));

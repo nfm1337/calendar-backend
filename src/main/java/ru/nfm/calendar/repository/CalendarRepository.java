@@ -7,7 +7,7 @@ import ru.nfm.calendar.model.Calendar;
 
 @Repository
 @Transactional(readOnly = true)
-public interface CalendarRepository extends JpaRepository<Calendar, Long> {
+public interface CalendarRepository extends JpaRepository<Calendar, Integer> {
 
 
 }

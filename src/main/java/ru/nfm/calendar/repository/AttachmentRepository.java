@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 @Transactional(readOnly = true)
-public interface AttachmentRepository extends JpaRepository<Attachment, Long> {
+public interface AttachmentRepository extends JpaRepository<Attachment, Integer> {
 
     List<Attachment> findAttachmentsByCalendarEvent(CalendarEvent calendarEvent);
 }
