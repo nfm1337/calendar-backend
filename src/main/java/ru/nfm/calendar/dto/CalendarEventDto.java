@@ -9,6 +9,5 @@ public record CalendarEventDto(
         Instant timeTo,
         Instant notificationTime,
         Boolean isBlocking
-
 ) {
 }

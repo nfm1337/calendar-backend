@@ -18,7 +18,6 @@ import ru.nfm.calendar.payload.request.SignInRequest;
 import ru.nfm.calendar.payload.request.SignUpRequest;
 import ru.nfm.calendar.payload.response.JwtAuthenticationResponse;
 import ru.nfm.calendar.repository.RefreshTokenRepository;
-import ru.nfm.calendar.repository.UserProfileRepository;
 import ru.nfm.calendar.repository.UserRepository;
 import ru.nfm.calendar.service.AuthenticationService;
 import ru.nfm.calendar.service.JwtAccessTokenService;
@@ -34,7 +33,6 @@ import java.util.UUID;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserRepository userRepository;
-    private final UserProfileRepository userProfileRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtAccessTokenService jwtAccessTokenService;
@@ -91,9 +89,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void logOutFromAllDevices(String token) {
-        String username = jwtAccessTokenService.extractUsername(token);
-        User user = userRepository.getExistedByEmail(username);
+    public void logOutFromAllDevices(User user) {
         user.setInvalidateTokenBefore(Instant.now());
         refreshTokenRepository.deleteByUser(user);
     }

@@ -6,36 +6,25 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.nfm.calendar.dto.CalendarEventDto;
-import ru.nfm.calendar.mapper.CalendarEventMapper;
 import ru.nfm.calendar.model.CalendarEvent;
 import ru.nfm.calendar.model.CalendarRole;
 import ru.nfm.calendar.model.CalendarUser;
 import ru.nfm.calendar.model.User;
 import ru.nfm.calendar.repository.CalendarEventRepository;
-import ru.nfm.calendar.repository.CalendarRepository;
 import ru.nfm.calendar.repository.CalendarUserRepository;
-import ru.nfm.calendar.repository.UserRepository;
 import ru.nfm.calendar.service.CalendarEventService;
-import ru.nfm.calendar.util.SecurityUtil;
 
 @Service
 @AllArgsConstructor
 public class CalendarEventServiceImpl implements CalendarEventService {
 
-    private final UserRepository userRepository;
-    private final CalendarRepository calendarRepository;
     private final CalendarUserRepository calendarUserRepository;
     private final CalendarEventRepository calendarEventRepository;
-    private final CalendarEventMapper calendarEventMapper;
 
     @Override
     @Transactional
-    public CalendarEventDto createCalendarEvent(int calendarId, CalendarEventDto calendarEventDto) {
-        String email = SecurityUtil.getUserDetails().getUsername();
-        User user = userRepository.getExistedByEmail(email);
-
-        CalendarUser calendarUser = calendarUserRepository.findByUserProfileIdAndCalendarId(user.getId(), calendarId)
-                .orElseThrow(EntityNotFoundException::new);
+    public CalendarEvent createCalendarEvent(User user, int calendarId, CalendarEventDto calendarEventDto) {
+        CalendarUser calendarUser = calendarUserRepository.getExistedByUserIdAndCalendarId(user.getId(), calendarId);
 
         if (calendarUser.getCalendarRole() == CalendarRole.USER) {
             throw new AccessDeniedException("Нет прав на создание событий");
@@ -54,6 +43,37 @@ public class CalendarEventServiceImpl implements CalendarEventService {
 
         event.addAttachedUser(user.getUserProfile());
 
-        return calendarEventMapper.toDto(calendarEventRepository.save(event));
+        return calendarEventRepository.save(event);
     }
+
+    @Override
+    @Transactional
+    public CalendarEvent updateCalendarEvent(User user, int calendarId, int eventId, CalendarEventDto calendarEventDto) {
+        CalendarUser calendarUser = calendarUserRepository.getExistedByUserIdAndCalendarId(user.getId(), calendarId);
+
+        if (calendarUser.getCalendarRole() == CalendarRole.USER) {
+            throw new AccessDeniedException("Нет прав на редактирование событий");
+        }
+
+        CalendarEvent event = calendarEventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Событие с id: " + eventId + " не найден"));
+        event.setTitle(calendarEventDto.title());
+        event.setDescription(calendarEventDto.description());
+        event.setTimeFrom(calendarEventDto.timeFrom());
+        event.setTimeTo(calendarEventDto.timeTo());
+        event.setIsBlocking(calendarEventDto.isBlocking());
+        event.setNotificationTime(calendarEventDto.notificationTime());
+
+        return calendarEventRepository.save(event);
+    }
+
+    @Override
+    @Transactional
+    public CalendarEvent getCalendarEvent(User user, int calendarId, int eventId) {
+        calendarUserRepository.findByUserIdAndCalendarId(user.getId(), calendarId)
+                .orElseThrow(() -> new AccessDeniedException("No access to calendar with id: " + calendarId));
+        return calendarEventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event with id: " + eventId + " not found"));
+    }
+
 }

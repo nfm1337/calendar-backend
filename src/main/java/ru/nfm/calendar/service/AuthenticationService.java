@@ -1,5 +1,6 @@
 package ru.nfm.calendar.service;
 
+import ru.nfm.calendar.model.User;
 import ru.nfm.calendar.payload.request.RefreshTokenRequest;
 import ru.nfm.calendar.payload.request.SignInRequest;
 import ru.nfm.calendar.payload.request.SignUpRequest;
@@ -13,5 +14,5 @@ public interface AuthenticationService {
 
     JwtAuthenticationResponse refreshToken(RefreshTokenRequest request);
 
-    void logOutFromAllDevices(String token);
+    void logOutFromAllDevices(User user);
 }

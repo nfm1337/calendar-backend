@@ -6,6 +6,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.nfm.calendar.dto.CalendarDto;
+import ru.nfm.calendar.exception.UserNotFoundException;
 import ru.nfm.calendar.mapper.CalendarUserMapper;
 import ru.nfm.calendar.model.*;
 import ru.nfm.calendar.payload.request.CalendarRequest;
@@ -13,7 +14,6 @@ import ru.nfm.calendar.repository.CalendarRepository;
 import ru.nfm.calendar.repository.CalendarUserRepository;
 import ru.nfm.calendar.repository.UserProfileRepository;
 import ru.nfm.calendar.service.CalendarService;
-import ru.nfm.calendar.util.SecurityUtil;
 
 import java.util.List;
 
@@ -29,10 +29,9 @@ public class CalendarServiceImpl implements CalendarService {
 
     @Override
     @Transactional
-    public Calendar createCalendar(CalendarRequest calendarRequest) {
-        String email = SecurityUtil.getUserDetails().getUsername();
-        UserProfile userProfile = userProfileRepository.getExistedByEmail(email);
-
+    public Calendar createCalendar(User user, CalendarRequest calendarRequest) {
+        UserProfile userProfile = userProfileRepository.findById(user.getId())
+                .orElseThrow(() -> new UserNotFoundException(user.getId(), "not found"));
         Calendar calendar = Calendar.builder()
                 .color(calendarRequest.color())
                 .title(calendarRequest.title())
@@ -57,24 +56,22 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    @Transactional
-    public List<CalendarDto> getUserCalendars() {
-        String email = SecurityUtil.getUserDetails().getUsername();
-        UserProfile userProfile = userProfileRepository.getExistedByEmail(email);
+    public List<CalendarDto> getUserCalendars(User user) {
+        UserProfile userProfile = userProfileRepository.findByIdWithCalendarUsers(user.getId())
+                .orElseThrow(() -> new UserNotFoundException(user.getId(), "not found"));
 
         return userProfile.getCalendarUserList().stream()
-                .map(user -> calendarUserMapper.toDto(user.getCalendar(), user.getIsCalendarActive()))
+                .map(u -> calendarUserMapper.toDto(u.getCalendar(), u.getIsCalendarActive()))
                 .toList();
     }
 
     @Override
     @Transactional
-    public boolean toggleIsActive(int id) {
-        String email = SecurityUtil.getUserDetails().getUsername();
-        UserProfile userProfile = userProfileRepository.getExistedByEmail(email);
+    public boolean toggleIsActive(User user, int id) {
+        UserProfile userProfile = user.getUserProfile();
 
         CalendarUser calendarUser = userProfile.getCalendarUserList().stream()
-                .filter(user -> user.getCalendar().getId().equals(id))
+                .filter(u -> u.getCalendar().getId().equals(id))
                 .findFirst()
                 .orElse(null);
 
@@ -85,6 +82,6 @@ public class CalendarServiceImpl implements CalendarService {
             return calendarUser.getIsCalendarActive();
         }
 
-        throw new AccessDeniedException("");
+        throw new AccessDeniedException("Невозможно изменить состояние чужого календаря");
     }
 }

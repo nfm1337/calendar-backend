@@ -10,25 +10,19 @@ import ru.nfm.calendar.model.User;
 import ru.nfm.calendar.model.UserProfile;
 import ru.nfm.calendar.payload.request.UserProfileRequest;
 import ru.nfm.calendar.repository.UserProfileRepository;
-import ru.nfm.calendar.repository.UserRepository;
 import ru.nfm.calendar.service.UserProfileService;
-import ru.nfm.calendar.util.SecurityUtil;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class UserProfileServiceImpl implements UserProfileService {
 
-    private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
     private final UserProfileMapper userProfileMapper;
 
     @Override
     @Transactional
-    public UserProfile setupUserProfile(UserProfileRequest request) {
-        String email = SecurityUtil.getUserEmail();
-        User user = userRepository.getExistedByEmail(email);
-
+    public UserProfile setupUserProfile(User user, UserProfileRequest request) {
         UserProfile userProfile = new UserProfile();
         userProfile.setUser(user);
         userProfile.setFirstName(request.firstName());
@@ -43,9 +37,8 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     @Transactional
-    public UserProfileDto updateUserProfile(UserProfileRequest request) {
-        String email = SecurityUtil.getUserEmail();
-        UserProfile userProfile = userProfileRepository.getExistedByEmail(email);
+    public UserProfileDto updateUserProfile(User user, UserProfileRequest request) {
+        UserProfile userProfile = user.getUserProfile();
         userProfile.setFirstName(request.firstName());
         userProfile.setLastName(request.lastName());
         userProfile.setSurName(request.surName());

@@ -1,14 +1,15 @@
 package ru.nfm.calendar.web.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.nfm.calendar.model.User;
 import ru.nfm.calendar.payload.request.RefreshTokenRequest;
 import ru.nfm.calendar.payload.request.SignInRequest;
 import ru.nfm.calendar.payload.request.SignUpRequest;
@@ -38,9 +39,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/log-out")
-    public ResponseEntity<String> logoutFromAllDevices(HttpServletRequest request) {
-        String token = request.getHeader("Authorization").substring(7);
-        authenticationService.logOutFromAllDevices(token);
+    public ResponseEntity<String> logoutFromAllDevices(@AuthenticationPrincipal User user) {
+        authenticationService.logOutFromAllDevices(user);
         return ResponseEntity.ok("Logged out successfully");
     }
 }

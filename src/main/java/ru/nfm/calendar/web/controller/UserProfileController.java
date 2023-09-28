@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import ru.nfm.calendar.model.User;
 import ru.nfm.calendar.model.UserProfile;
 import ru.nfm.calendar.payload.request.UserProfileRequest;
 import ru.nfm.calendar.payload.response.UserProfileSetupResponse;
@@ -21,8 +23,9 @@ public class UserProfileController {
     private final UserProfileService userProfileService;
 
     @PostMapping
-    public ResponseEntity<UserProfileSetupResponse> createUserProfile(@Valid @RequestBody UserProfileRequest request) {
-        UserProfile userProfile = userProfileService.setupUserProfile(request);
+    public ResponseEntity<UserProfileSetupResponse> createUserProfile(@AuthenticationPrincipal User user,
+                                                                      @Valid @RequestBody UserProfileRequest request) {
+        UserProfile userProfile = userProfileService.setupUserProfile(user, request);
         var response = new UserProfileSetupResponse(
                 "Регистрация завершена успешно",
                 userProfile.getId(),
@@ -32,10 +35,11 @@ public class UserProfileController {
     }
 
     @PutMapping
-    public ResponseEntity<UserProfileUpdateResponse> updateUserProfile(@Valid @RequestBody UserProfileRequest request) {
+    public ResponseEntity<UserProfileUpdateResponse> updateUserProfile(@AuthenticationPrincipal User user,
+                                                                       @Valid @RequestBody UserProfileRequest request) {
         var response = new UserProfileUpdateResponse(
                 "Обновление профиля завершено успешно",
-                userProfileService.updateUserProfile(request));
+                userProfileService.updateUserProfile(user, request));
 
         return ResponseEntity.ok(response);
     }
