@@ -3,7 +3,6 @@ package ru.nfm.calendar.service.impl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.nfm.calendar.dto.UserProfileDto;
 import ru.nfm.calendar.mapper.UserProfileMapper;
 import ru.nfm.calendar.model.User;
@@ -21,7 +20,6 @@ public class UserProfileServiceImpl implements UserProfileService {
     private final UserProfileMapper userProfileMapper;
 
     @Override
-    @Transactional
     public UserProfile setupUserProfile(User user, UserProfileRequest request) {
         UserProfile userProfile = new UserProfile();
         userProfile.setUser(user);
@@ -36,7 +34,6 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    @Transactional
     public UserProfileDto updateUserProfile(User user, UserProfileRequest request) {
         UserProfile userProfile = user.getUserProfile();
         userProfile.setFirstName(request.firstName());
