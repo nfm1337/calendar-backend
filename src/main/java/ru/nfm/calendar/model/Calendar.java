@@ -20,7 +20,7 @@ public class Calendar {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "creator_id", updatable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private UserProfile creator;

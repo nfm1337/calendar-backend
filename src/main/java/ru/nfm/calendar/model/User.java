@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.Hibernate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.proxy.HibernateProxy;
@@ -76,12 +75,6 @@ public class User implements UserDetails {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<UserRole> roles;
 
-    public UserProfile getUserProfile() {
-        if (userProfile instanceof HibernateProxy) {
-            return (UserProfile) Hibernate.unproxy(userProfile);
-        }
-        return userProfile;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
