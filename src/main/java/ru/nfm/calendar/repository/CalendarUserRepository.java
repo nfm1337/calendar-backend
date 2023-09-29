@@ -11,6 +11,9 @@ import java.util.Optional;
 @Repository
 public interface CalendarUserRepository extends JpaRepository<CalendarUser, Integer> {
 
+    @Query("SELECT cu FROM CalendarUser cu WHERE cu.userProfile.id =:userId AND cu.calendar.id = :calendarId")
+    Optional<CalendarUser> findCalendarUserByUserIdAndCalendarId(int userId, int calendarId);
+
     @Query("SELECT cu FROM CalendarUser cu WHERE cu.userProfile.id = :userId AND cu.calendar.id = :calendarId")
     Optional<CalendarUser> findByUserIdAndCalendarId(int userId, int calendarId);
 

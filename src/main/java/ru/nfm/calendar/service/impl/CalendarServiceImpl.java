@@ -1,8 +1,8 @@
 package ru.nfm.calendar.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.nfm.calendar.dto.CalendarDto;
@@ -67,21 +67,13 @@ public class CalendarServiceImpl implements CalendarService {
 
     @Override
     @Transactional
-    public boolean toggleIsActive(User user, int id) {
-        UserProfile userProfile = user.getUserProfile();
+    public boolean toggleIsActive(User user, int calendarId) {
+        CalendarUser calendarUser = calendarUserRepository.findCalendarUserByUserIdAndCalendarId(user.getId(), calendarId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Calendar user with userId: " + user.getId() + " and calendarId: " + calendarId + " not found"));
+        calendarUser.setIsCalendarActive(!calendarUser.getIsCalendarActive());
+        calendarUserRepository.save(calendarUser);
 
-        CalendarUser calendarUser = userProfile.getCalendarUserList().stream()
-                .filter(u -> u.getCalendar().getId().equals(id))
-                .findFirst()
-                .orElse(null);
-
-        if (calendarUser != null) {
-            calendarUser.setIsCalendarActive(!calendarUser.getIsCalendarActive());
-            calendarUserRepository.save(calendarUser);
-
-            return calendarUser.getIsCalendarActive();
-        }
-
-        throw new AccessDeniedException("Невозможно изменить состояние чужого календаря");
+        return calendarUser.getIsCalendarActive();
     }
 }
