@@ -13,6 +13,10 @@ import ru.nfm.calendar.model.User;
 import ru.nfm.calendar.repository.CalendarEventRepository;
 import ru.nfm.calendar.repository.CalendarUserRepository;
 import ru.nfm.calendar.service.CalendarEventService;
+import ru.nfm.calendar.util.DateTimeUtil;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -70,10 +74,36 @@ public class CalendarEventServiceImpl implements CalendarEventService {
     @Override
     @Transactional
     public CalendarEvent getCalendarEvent(User user, int calendarId, int eventId) {
-        calendarUserRepository.findByUserIdAndCalendarId(user.getId(), calendarId)
-                .orElseThrow(() -> new AccessDeniedException("No access to calendar with id: " + calendarId));
+        checkUserBelongsToCalendar(user, calendarId);
         return calendarEventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event with id: " + eventId + " not found"));
     }
 
+    @Override
+    @Transactional
+    public List<CalendarEvent> getCalendarEventsByDateTimeRange(User user, int calendarId,
+                                                                LocalDateTime dtFrom, LocalDateTime dtTo) {
+        checkUserBelongsToCalendar(user, calendarId);
+        return calendarEventRepository.findCalendarEventsByDateTimeRange(
+                calendarId,
+                DateTimeUtil.convertLocalDateTimeToInstant(dtFrom),
+                DateTimeUtil.convertLocalDateTimeToInstant(dtTo));
+    }
+
+    @Override
+    @Transactional
+    public List<CalendarEvent> getUserAttachedCalendarEventsByDateTimeRange(User user, int calendarId,
+                                                                            LocalDateTime dtFrom, LocalDateTime dtTo) {
+        checkUserBelongsToCalendar(user, calendarId);
+        return calendarEventRepository.findUserAttachedCalendarEventsByDateTimeRange(
+                user.getId(),
+                calendarId,
+                DateTimeUtil.convertLocalDateTimeToInstant(dtFrom),
+                DateTimeUtil.convertLocalDateTimeToInstant(dtTo));
+    }
+
+    private void checkUserBelongsToCalendar(User user, int calendarId) {
+        calendarUserRepository.findByUserIdAndCalendarId(user.getId(), calendarId)
+                .orElseThrow(() -> new AccessDeniedException("No access to calendar with id: " + calendarId));
+    }
 }

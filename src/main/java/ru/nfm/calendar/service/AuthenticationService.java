@@ -7,12 +7,8 @@ import ru.nfm.calendar.payload.request.SignUpRequest;
 import ru.nfm.calendar.payload.response.JwtAuthenticationResponse;
 
 public interface AuthenticationService {
-
     JwtAuthenticationResponse signUp(SignUpRequest request);
-
     JwtAuthenticationResponse signIn(SignInRequest request);
-
     JwtAuthenticationResponse refreshToken(RefreshTokenRequest request);
-
     void logOutFromAllDevices(User user);
 }
