@@ -32,6 +32,7 @@ public class CalendarServiceImpl implements CalendarService {
     public Calendar createCalendar(User user, CalendarRequest calendarRequest) {
         UserProfile userProfile = userProfileRepository.findById(user.getId())
                 .orElseThrow(() -> new UserNotFoundException(user.getId(), "not found"));
+
         Calendar calendar = Calendar.builder()
                 .color(calendarRequest.color())
                 .title(calendarRequest.title())

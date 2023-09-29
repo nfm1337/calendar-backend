@@ -10,7 +10,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.nfm.calendar.dto.CalendarEventDto;
-import ru.nfm.calendar.mapper.CalendarEventMapper;
 import ru.nfm.calendar.model.User;
 import ru.nfm.calendar.service.CalendarEventService;
 
@@ -27,7 +26,6 @@ import static ru.nfm.calendar.web.controller.CalendarEventController.REST_URL;
 public class CalendarEventController {
     static final String REST_URL = CalendarController.REST_URL + "/{calendarId}/events";
     private final CalendarEventService calendarEventService;
-    private final CalendarEventMapper calendarEventMapper;
 
     @PostMapping
     public ResponseEntity<CalendarEventDto> createCalendarEvent(@AuthenticationPrincipal User user,
@@ -37,10 +35,10 @@ public class CalendarEventController {
         URI uriComponentsBuilder = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
                 .path("/{id}")
-                .buildAndExpand(event.getId())
+                .buildAndExpand(event.id())
                 .toUri();
 
-        return ResponseEntity.created(uriComponentsBuilder).body(calendarEventMapper.toDto(event));
+        return ResponseEntity.created(uriComponentsBuilder).body(event);
     }
 
     @GetMapping
@@ -51,7 +49,7 @@ public class CalendarEventController {
             @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dtTo) {
 
         var events = calendarEventService.getCalendarEventsByDateTimeRange(user, calendarId, dtFrom, dtTo);
-        return ResponseEntity.ok(calendarEventMapper.toDtoList(events));
+        return ResponseEntity.ok(events);
     }
 
     @GetMapping("/{eventId}")
@@ -59,7 +57,7 @@ public class CalendarEventController {
                                                              @PathVariable int calendarId,
                                                              @PathVariable int eventId) {
         var event = calendarEventService.getCalendarEvent(user, calendarId, eventId);
-        return ResponseEntity.ok(calendarEventMapper.toDto(event));
+        return ResponseEntity.ok(event);
     }
 
     @PutMapping("/{eventId}")
@@ -68,17 +66,17 @@ public class CalendarEventController {
                                                                 @PathVariable int eventId,
                                                                 @Valid @RequestBody CalendarEventDto calendarEventDto) {
         var event = calendarEventService.updateCalendarEvent(user, calendarId, eventId, calendarEventDto);
-        return ResponseEntity.ok(calendarEventMapper.toDto(event));
+        return ResponseEntity.ok(event);
     }
 
     @GetMapping("/attached-events")
-    public ResponseEntity<List<CalendarEventDto>> getAttachedEventsByDateTimeRange(
+    public ResponseEntity<List<CalendarEventDto>> getUserAttachedEventsByDateTimeRange(
             @AuthenticationPrincipal User user,
             @PathVariable int calendarId,
             @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dtFrom,
             @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dtTo) {
 
         var events = calendarEventService.getUserAttachedCalendarEventsByDateTimeRange(user, calendarId, dtFrom, dtTo);
-        return ResponseEntity.ok(calendarEventMapper.toDtoList(events));
+        return ResponseEntity.ok(events);
     }
 }
