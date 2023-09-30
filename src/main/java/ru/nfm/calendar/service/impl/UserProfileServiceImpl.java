@@ -1,14 +1,16 @@
 package ru.nfm.calendar.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.nfm.calendar.dto.UserProfileDto;
 import ru.nfm.calendar.mapper.UserProfileMapper;
 import ru.nfm.calendar.model.User;
 import ru.nfm.calendar.model.UserProfile;
-import ru.nfm.calendar.payload.request.UserProfileRequest;
 import ru.nfm.calendar.repository.UserProfileRepository;
+import ru.nfm.calendar.repository.UserRepository;
 import ru.nfm.calendar.service.UserProfileService;
 
 @Service
@@ -18,31 +20,26 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     private final UserProfileRepository userProfileRepository;
     private final UserProfileMapper userProfileMapper;
+    private final UserRepository userRepository;
 
     @Override
-    public UserProfile setupUserProfile(User user, UserProfileRequest request) {
+    @Transactional
+    public UserProfileDto setupUserProfile(int userId, UserProfileDto userProfileDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Can't find user with id: " + userId));
         UserProfile userProfile = new UserProfile();
         userProfile.setUser(user);
-        userProfile.setFirstName(request.firstName());
-        userProfile.setLastName(request.lastName());
-        userProfile.setSurName(request.surName());
-        userProfile.setCompanyName(request.companyName());
-        userProfile.setPosition(request.position());
-        userProfile.setTimezone(request.timezone());
-
-        return userProfileRepository.save(userProfile);
+        userProfileMapper.updateUserProfileFromDto(userProfileDto, userProfile);
+        return userProfileMapper.toDto(userProfileRepository.save(userProfile));
     }
 
     @Override
-    public UserProfileDto updateUserProfile(User user, UserProfileRequest request) {
+    @Transactional
+    public UserProfileDto updateUserProfile(int userId, UserProfileDto userProfileDto) {
+        User user = userRepository.findByIdWithUserProfile(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Can't find user with id: " + userId));
         UserProfile userProfile = user.getUserProfile();
-        userProfile.setFirstName(request.firstName());
-        userProfile.setLastName(request.lastName());
-        userProfile.setSurName(request.surName());
-        userProfile.setCompanyName(request.companyName());
-        userProfile.setPosition(request.position());
-        userProfile.setTimezone(request.timezone());
-
+        userProfileMapper.updateUserProfileFromDto(userProfileDto, userProfile);
         return userProfileMapper.toDto(userProfileRepository.save(userProfile));
     }
 }

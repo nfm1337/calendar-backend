@@ -21,19 +21,14 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("SELECT u FROM User u WHERE u.email = :email")
     Optional<User> findByEmail(String email);
 
-    @EntityGraph(attributePaths = {"userProfile", "roles"})
-    @Query("SELECT u FROM User u WHERE u.email = :email")
-    Optional<User> findByEmailWithUserProfile(String email);
+    @EntityGraph(attributePaths = {"userProfile"})
+    @Query("SELECT u FROM User u WHERE u.id = :id")
+    Optional<User> findByIdWithUserProfile(int id);
 
     boolean existsByEmail(String email);
 
     default User getExistedByEmail(String email) {
         return findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found"));
-    }
-
-    default User getExistedByEmailWithUserProfile(String email) {
-        return findByEmailWithUserProfile(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found"));
     }
 }

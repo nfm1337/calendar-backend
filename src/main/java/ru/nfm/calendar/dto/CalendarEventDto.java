@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
-import ru.nfm.calendar.util.validation.NoHtml;
+import ru.nfm.calendar.util.validation.nohtml.NoHtml;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +14,6 @@ public record CalendarEventDto(
         @NotBlank
         @NoHtml
         String title,
-        @NotBlank
         @NoHtml
         String description,
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)

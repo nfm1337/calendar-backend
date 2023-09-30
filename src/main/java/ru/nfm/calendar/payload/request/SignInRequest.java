@@ -1,7 +1,7 @@
 package ru.nfm.calendar.payload.request;
 
 import jakarta.validation.constraints.NotBlank;
-import ru.nfm.calendar.util.validation.NoHtml;
+import ru.nfm.calendar.util.validation.nohtml.NoHtml;
 
 public record SignInRequest(
         @NoHtml

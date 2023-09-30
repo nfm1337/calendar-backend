@@ -1,4 +1,4 @@
-package ru.nfm.calendar.util.validation;
+package ru.nfm.calendar.util.validation.nohtml;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
