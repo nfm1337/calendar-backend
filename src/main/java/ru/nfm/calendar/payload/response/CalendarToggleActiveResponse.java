@@ -1,4 +1,6 @@
 package ru.nfm.calendar.payload.response;
 
-public record CalendarToggleActiveResponse(boolean isActive) {
+public record CalendarToggleActiveResponse(
+        boolean isActive
+) {
 }

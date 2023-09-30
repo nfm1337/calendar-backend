@@ -77,4 +77,12 @@ public class CalendarEventController {
         var events = calendarEventService.getUserAttachedCalendarEventsByDateTimeRange(user, calendarId, dtFrom, dtTo);
         return ResponseEntity.ok(events);
     }
+
+    @DeleteMapping("/{eventId}")
+    public ResponseEntity<Void> deleteCalendarEvent(@AuthenticationPrincipal User user,
+                                                    @PathVariable int calendarId,
+                                                    @PathVariable int eventId) {
+        calendarEventService.deleteCalendarEvent(user, calendarId, eventId);
+        return ResponseEntity.noContent().build();
+    }
 }

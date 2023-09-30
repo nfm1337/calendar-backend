@@ -14,4 +14,5 @@ public interface CalendarEventService {
             User user, int calendarId, LocalDateTime dtFrom, LocalDateTime dtTo);
     List<CalendarEventDto> getUserAttachedCalendarEventsByDateTimeRange(
             User user, int calendarId, LocalDateTime dtFrom, LocalDateTime dtTo);
+    void deleteCalendarEvent(User user, int calendarId, int eventId);
 }

@@ -95,11 +95,10 @@ public class CalendarEventServiceImpl implements CalendarEventService {
 
     @Override
     @Transactional
-    public List<CalendarEventDto> getUserAttachedCalendarEventsByDateTimeRange(
-            User user,
-            int calendarId,
-            LocalDateTime dtFrom, LocalDateTime dtTo) {
-
+    public List<CalendarEventDto> getUserAttachedCalendarEventsByDateTimeRange(User user,
+                                                                               int calendarId,
+                                                                               LocalDateTime dtFrom,
+                                                                               LocalDateTime dtTo) {
         checkUserBelongsToCalendar(user, calendarId);
         String userTimezone = userProfileRepository.getUserTimezoneByUserId(user.getId());
         var events = calendarEventRepository.findUserAttachedCalendarEventsByDateTimeRange(
@@ -111,9 +110,17 @@ public class CalendarEventServiceImpl implements CalendarEventService {
         return calendarEventMapper.toDtoList(events, userTimezone);
     }
 
+    @Override
+    @Transactional
+    public void deleteCalendarEvent(User user, int calendarId, int eventId) {
+        var calendarUser = calendarUserRepository.getExistedByUserIdAndCalendarId(user.getId(), calendarId);
+        checkUserEditRights(calendarUser);
+        calendarEventRepository.deleteById(eventId);
+    }
+
     private void checkUserEditRights(CalendarUser calendarUser) {
         if (calendarUser.getCalendarRole() == CalendarRole.USER) {
-            throw new AccessDeniedException("Нет прав на редактирование событий");
+            throw new AccessDeniedException("Нет прав для редактирования событий");
         }
     }
 

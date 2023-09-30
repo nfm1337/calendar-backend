@@ -1,6 +1,7 @@
 package ru.nfm.calendar.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -27,4 +28,8 @@ public interface CalendarEventRepository extends JpaRepository<CalendarEvent, In
                                                                       @Param("calendarId") int calendarId,
                                                                       @Param("dtFrom") Instant dtFrom,
                                                                       @Param("dtTo") Instant dtTo);
+
+    @Transactional
+    @Modifying
+    void deleteById(int id);
 }
