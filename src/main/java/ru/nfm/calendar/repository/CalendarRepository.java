@@ -1,6 +1,7 @@
 package ru.nfm.calendar.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.nfm.calendar.model.Calendar;
@@ -9,5 +10,7 @@ import ru.nfm.calendar.model.Calendar;
 @Transactional(readOnly = true)
 public interface CalendarRepository extends JpaRepository<Calendar, Integer> {
 
-
+    @Modifying
+    @Transactional
+    void deleteById(int id);
 }

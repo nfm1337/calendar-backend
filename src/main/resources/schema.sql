@@ -84,26 +84,26 @@ CREATE TABLE attachment
 );
 
 ALTER TABLE user_role
-    ADD FOREIGN KEY (user_id) REFERENCES users (id);
+    ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
 ALTER TABLE user_profile
-    ADD FOREIGN KEY (id) REFERENCES users (id);
+    ADD FOREIGN KEY (id) REFERENCES users (id) ON DELETE CASCADE;
 ALTER TABLE refresh_token
-    ADD FOREIGN KEY (user_id) REFERENCES users (id);
+    ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
 ALTER TABLE calendar
-    ADD FOREIGN KEY (creator_id) REFERENCES users (id);
+    ADD FOREIGN KEY (creator_id) REFERENCES users (id) ON DELETE CASCADE;
 ALTER TABLE calendar_event
-    ADD FOREIGN KEY (calendar_id) REFERENCES calendar (id);
+    ADD FOREIGN KEY (calendar_id) REFERENCES calendar (id) ON DELETE CASCADE;
 ALTER TABLE calendar_event
-    ADD FOREIGN KEY (creator_id) REFERENCES users (id);
+    ADD FOREIGN KEY (creator_id) REFERENCES users (id) ON DELETE CASCADE;
 ALTER TABLE calendar_user
-    ADD FOREIGN KEY (user_id) REFERENCES users (id);
+    ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
 ALTER TABLE calendar_user
-    ADD FOREIGN KEY (calendar_id) REFERENCES calendar (id);
+    ADD FOREIGN KEY (calendar_id) REFERENCES calendar (id) ON DELETE CASCADE;
 ALTER TABLE calendar_event_user
-    ADD FOREIGN KEY (user_id) REFERENCES users (id);
+    ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
 ALTER TABLE calendar_event_user
-    ADD FOREIGN KEY (calendar_event_id) REFERENCES calendar_event (id);
+    ADD FOREIGN KEY (calendar_event_id) REFERENCES calendar_event (id) ON DELETE CASCADE;
 ALTER TABLE attachment
-    ADD FOREIGN KEY (calendar_event_id) REFERENCES calendar_event (id);
+    ADD FOREIGN KEY (calendar_event_id) REFERENCES calendar_event (id) ON DELETE CASCADE;
 ALTER TABLE refresh_token
-    ADD FOREIGN KEY (user_id) REFERENCES users (id)
+    ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE

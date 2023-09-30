@@ -17,10 +17,8 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ru.nfm.calendar.web.controller.CalendarEventController.REST_URL;
-
 @RestController
-@RequestMapping(value = REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = CalendarEventController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @AllArgsConstructor
 @Slf4j
 public class CalendarEventController {

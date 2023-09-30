@@ -47,7 +47,13 @@ public class CalendarEvent {
     @ManyToOne(fetch = FetchType.LAZY)
     private Calendar calendar;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "attachment",
+            joinColumns = @JoinColumn(name = "calendar_event_id"),
+            inverseJoinColumns = @JoinColumn(name = "id")
+    )
+    @JoinColumn(name = "id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Attachment> attachments;
 
     @JoinTable(name = "calendar_event_user",

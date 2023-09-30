@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "attachment")
@@ -15,10 +17,12 @@ import lombok.Setter;
 public class Attachment {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "calendar_event_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private CalendarEvent calendarEvent;
 
     @Column(name = "title")

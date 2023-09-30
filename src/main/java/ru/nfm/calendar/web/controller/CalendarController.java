@@ -48,15 +48,26 @@ public class CalendarController {
 
     @GetMapping
     public ResponseEntity<List<CalendarDto>> getUserCalendarList(@AuthenticationPrincipal User user) {
-        List<CalendarDto> calendarList = calendarService.getUserCalendars(user);
-        return ResponseEntity.ok(calendarList);
+        return ResponseEntity.ok(calendarService.getUserCalendars(user));
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<CalendarToggleActiveResponse> toggleIsActive(@AuthenticationPrincipal User user,
                                                                        @PathVariable int id) {
-        var isActiveResponse = new CalendarToggleActiveResponse(calendarService.toggleIsActive(user, id));
-        return ResponseEntity.ok(isActiveResponse);
+        return ResponseEntity.ok(calendarService.toggleIsActive(user, id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CalendarDto> updateCalendar(@AuthenticationPrincipal User user,
+                                                      @PathVariable int id,
+                                                      @RequestBody CalendarDto calendarDto) {
+        return ResponseEntity.ok(calendarService.updateCalendar(user, id, calendarDto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCalendar(@AuthenticationPrincipal User user, @PathVariable int id) {
+        calendarService.deleteCalendar(user, id);
+        return ResponseEntity.noContent().build();
     }
 
 }
