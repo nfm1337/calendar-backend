@@ -35,10 +35,7 @@ public class CalendarEventServiceImpl implements CalendarEventService {
     @Transactional
     public CalendarEventDto createCalendarEvent(User user, int calendarId, CalendarEventDto calendarEventDto) {
         CalendarUser calendarUser = calendarUserRepository.getExistedByUserIdAndCalendarId(user.getId(), calendarId);
-
-        if (calendarUser.getCalendarRole() == CalendarRole.USER) {
-            throw new AccessDeniedException("Нет прав на создание событий");
-        }
+        checkUserEditRights(calendarUser);
         String userTimezone = userProfileRepository.getUserTimezoneByUserId(user.getId());
         CalendarEvent event = CalendarEvent.builder()
                 .title(calendarEventDto.title())
@@ -49,7 +46,8 @@ public class CalendarEventServiceImpl implements CalendarEventService {
                 .timeTo(DateTimeUtil.convertLocalDateTimeToUtcInstant(userTimezone, calendarEventDto.timeTo()))
                 .isBlocking(calendarEventDto.isBlocking())
                 .notificationTime(DateTimeUtil.convertLocalDateTimeToUtcInstant(
-                        userTimezone, calendarEventDto.notificationTime()))
+                        userTimezone, calendarEventDto.notificationTime())
+                )
                 .build();
 
         event.addAttachedUser(user.getUserProfile());
@@ -59,12 +57,10 @@ public class CalendarEventServiceImpl implements CalendarEventService {
 
     @Override
     @Transactional
-    public CalendarEventDto updateCalendarEvent(User user, int calendarId, int eventId, CalendarEventDto calendarEventDto) {
+    public CalendarEventDto updateCalendarEvent(User user, int calendarId, int eventId,
+                                                CalendarEventDto calendarEventDto) {
         CalendarUser calendarUser = calendarUserRepository.getExistedByUserIdAndCalendarId(user.getId(), calendarId);
-
-        if (calendarUser.getCalendarRole() == CalendarRole.USER) {
-            throw new AccessDeniedException("Нет прав на редактирование событий");
-        }
+        checkUserEditRights(calendarUser);
         String userTimezone = userProfileRepository.getUserTimezoneByUserId(user.getId());
         CalendarEvent event = calendarEventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Событие с id: " + eventId + " не найден"));
@@ -86,7 +82,7 @@ public class CalendarEventServiceImpl implements CalendarEventService {
     @Override
     @Transactional
     public List<CalendarEventDto> getCalendarEventsByDateTimeRange(User user, int calendarId,
-                                                                LocalDateTime dtFrom, LocalDateTime dtTo) {
+                                                                   LocalDateTime dtFrom, LocalDateTime dtTo) {
         checkUserBelongsToCalendar(user, calendarId);
         String userTimezone = userProfileRepository.getUserTimezoneByUserId(user.getId());
         var events = calendarEventRepository.findCalendarEventsByDateTimeRange(
@@ -99,8 +95,11 @@ public class CalendarEventServiceImpl implements CalendarEventService {
 
     @Override
     @Transactional
-    public List<CalendarEventDto> getUserAttachedCalendarEventsByDateTimeRange(User user, int calendarId,
-                                                                            LocalDateTime dtFrom, LocalDateTime dtTo) {
+    public List<CalendarEventDto> getUserAttachedCalendarEventsByDateTimeRange(
+            User user,
+            int calendarId,
+            LocalDateTime dtFrom, LocalDateTime dtTo) {
+
         checkUserBelongsToCalendar(user, calendarId);
         String userTimezone = userProfileRepository.getUserTimezoneByUserId(user.getId());
         var events = calendarEventRepository.findUserAttachedCalendarEventsByDateTimeRange(
@@ -110,6 +109,12 @@ public class CalendarEventServiceImpl implements CalendarEventService {
                 DateTimeUtil.convertLocalDateTimeToUtcInstant(userTimezone, dtTo));
 
         return calendarEventMapper.toDtoList(events, userTimezone);
+    }
+
+    private void checkUserEditRights(CalendarUser calendarUser) {
+        if (calendarUser.getCalendarRole() == CalendarRole.USER) {
+            throw new AccessDeniedException("Нет прав на редактирование событий");
+        }
     }
 
     private void checkUserBelongsToCalendar(User user, int calendarId) {

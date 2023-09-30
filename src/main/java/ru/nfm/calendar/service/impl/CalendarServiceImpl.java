@@ -74,7 +74,6 @@ public class CalendarServiceImpl implements CalendarService {
                         "Calendar user with userId: " + user.getId() + " and calendarId: " + calendarId + " not found"));
         calendarUser.setIsCalendarActive(!calendarUser.getIsCalendarActive());
         calendarUserRepository.save(calendarUser);
-
         return calendarUser.getIsCalendarActive();
     }
 }
