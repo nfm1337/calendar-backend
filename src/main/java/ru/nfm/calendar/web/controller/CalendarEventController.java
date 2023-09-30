@@ -2,7 +2,6 @@ package ru.nfm.calendar.web.controller;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,6 @@ import java.util.List;
 @RestController
 @RequestMapping(value = CalendarEventController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @AllArgsConstructor
-@Slf4j
 public class CalendarEventController {
     static final String REST_URL = CalendarController.REST_URL + "/{calendarId}/events";
     private final CalendarEventService calendarEventService;

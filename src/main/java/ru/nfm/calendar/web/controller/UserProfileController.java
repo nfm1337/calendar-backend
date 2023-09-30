@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,14 +21,13 @@ import java.net.URI;
 @RestController
 @RequestMapping(value = UserProfileController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @AllArgsConstructor
-@Slf4j
 public class UserProfileController {
     static final String REST_URL = "/profiles";
     private final UserProfileService userProfileService;
 
     @PostMapping
     @Operation(summary = "Создаёт UserProfile для авторизованного пользователя",
-            description = "Возвращает UserProfileDto, либо 403, либо 400 при неправильной валидации"
+            description = "Возвращает UserProfileDto и 201, либо 403, либо 400 при неправильной валидации"
     )
     @ApiResponses(value = {
             @ApiResponse(
