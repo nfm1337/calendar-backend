@@ -17,4 +17,7 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Intege
 
     @Query("SELECT up.timezone FROM UserProfile up WHERE up.id = :userId")
     String getUserTimezoneByUserId(int userId);
+
+    @Query("SELECT up FROM UserProfile up WHERE up.user.email = :email")
+    Optional<UserProfile> findByEmail(String email);
 }

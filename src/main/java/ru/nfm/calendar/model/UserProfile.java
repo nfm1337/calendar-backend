@@ -14,6 +14,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Builder
+@ToString
 public class UserProfile {
 
     @Id
@@ -46,6 +47,7 @@ public class UserProfile {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @ToString.Exclude
     private List<CalendarUser> calendarUserList;
 
     @ManyToMany
@@ -53,6 +55,7 @@ public class UserProfile {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "calendar_event_id")
     )
+    @ToString.Exclude
     private List<CalendarEvent> attachedEvents;
 
     @Override

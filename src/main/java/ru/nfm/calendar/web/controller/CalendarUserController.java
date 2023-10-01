@@ -4,12 +4,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.nfm.calendar.dto.CalendarUserDto;
 import ru.nfm.calendar.model.User;
+import ru.nfm.calendar.payload.response.CalendarUserInviteResponse;
 import ru.nfm.calendar.service.CalendarUserService;
 
 import java.util.List;
@@ -25,5 +23,12 @@ public class CalendarUserController {
     public ResponseEntity<List<CalendarUserDto>> getCalendarUsers(@AuthenticationPrincipal User user,
                                                                   @PathVariable int calendarId) {
         return ResponseEntity.ok(calendarUserService.getCalendarUsers(user.getId(), calendarId));
+    }
+
+    @PostMapping
+    public ResponseEntity<CalendarUserInviteResponse> inviteUserToCalendar(@AuthenticationPrincipal User user,
+                                                                           @PathVariable int calendarId,
+                                                                           @RequestParam String email) {
+        return ResponseEntity.ok(calendarUserService.inviteUserByEmail(user.getId(), calendarId, email));
     }
 }

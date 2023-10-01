@@ -36,6 +36,5 @@ public class CalendarUser {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private CalendarRole calendarRole;
 }

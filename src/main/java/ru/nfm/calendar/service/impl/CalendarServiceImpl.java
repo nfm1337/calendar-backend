@@ -76,7 +76,7 @@ public class CalendarServiceImpl implements CalendarService {
         var calendarUser = getCalendarUser(user, calendarId);
         calendarUser.setIsCalendarActive(!calendarUser.getIsCalendarActive());
         calendarUserRepository.save(calendarUser);
-        return new CalendarToggleActiveResponse(calendarUser.getIsCalendarActive());
+        return new CalendarToggleActiveResponse(calendarId, calendarUser.getIsCalendarActive());
     }
 
     @Override

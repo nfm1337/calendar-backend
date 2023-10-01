@@ -18,11 +18,11 @@ public class Calendar {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "creator_id", updatable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private UserProfile creator;
 
     @Column(name = "title", length = 256, nullable = false)
