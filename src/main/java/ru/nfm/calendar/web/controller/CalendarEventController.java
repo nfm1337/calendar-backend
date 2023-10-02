@@ -43,7 +43,6 @@ public class CalendarEventController {
             @PathVariable int calendarId,
             @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dtFrom,
             @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dtTo) {
-
         var events = calendarEventService.getCalendarEventsByDateTimeRange(user, calendarId, dtFrom, dtTo);
         return ResponseEntity.ok(events);
     }
