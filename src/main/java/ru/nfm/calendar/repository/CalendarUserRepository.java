@@ -19,7 +19,7 @@ public interface CalendarUserRepository extends JpaRepository<CalendarUser, Inte
     @Query("SELECT cu FROM CalendarUser cu WHERE cu.userProfile.id = :userId AND cu.calendar.id = :calendarId")
     Optional<CalendarUser> findByUserIdAndCalendarId(int userId, int calendarId);
 
-    @Query("SELECT new ru.nfm.calendar.dto.CalendarUserDto(u.id, u.email, up.firstName, up.lastName)" +
+    @Query("SELECT new ru.nfm.calendar.dto.CalendarUserDto(u.id, u.email, up.firstName, up.lastName, cu.calendarRole)" +
             "FROM CalendarUser cu " +
             "JOIN UserProfile up ON up.id = cu.userProfile.id " +
             "JOIN User u ON u.id = up.id " +

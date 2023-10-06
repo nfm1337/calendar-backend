@@ -31,4 +31,12 @@ public class CalendarUserController {
                                                                            @RequestParam String email) {
         return ResponseEntity.ok(calendarUserService.inviteUserByEmail(user.getId(), calendarId, email));
     }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> removeCalendarUser(@AuthenticationPrincipal User user,
+                                                   @PathVariable int calendarId,
+                                                   @PathVariable int userId) {
+        calendarUserService.deleteCalendarUser(user.getId(), calendarId, userId);
+        return ResponseEntity.noContent().build();
+    }
 }

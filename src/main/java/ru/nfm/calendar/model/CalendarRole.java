@@ -1,5 +1,12 @@
 package ru.nfm.calendar.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum CalendarRole {
-    CREATOR, EDITOR, USER, PENDING_INVITE
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    CREATOR,
+    EDITOR,
+    USER,
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    PENDING_INVITE
 }

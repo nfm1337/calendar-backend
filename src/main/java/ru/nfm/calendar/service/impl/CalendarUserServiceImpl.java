@@ -6,9 +6,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.nfm.calendar.dto.CalendarUserDto;
-import ru.nfm.calendar.model.CalendarRole;
-import ru.nfm.calendar.model.CalendarUser;
-import ru.nfm.calendar.model.CalendarUserKey;
+import ru.nfm.calendar.model.*;
 import ru.nfm.calendar.payload.response.CalendarUserInviteResponse;
 import ru.nfm.calendar.repository.CalendarRepository;
 import ru.nfm.calendar.repository.CalendarUserRepository;
@@ -24,12 +22,17 @@ public class CalendarUserServiceImpl implements CalendarUserService {
     private final UserProfileRepository userProfileRepository;
     private final CalendarRepository calendarRepository;
 
+    private static final String ACCESS_DENIED_MESSAGE = "Access denied: ";
+    private static final String CALENDAR_NOT_FOUND_MESSAGE = "Calendar not found with ID: ";
+    private static final String USER_NOT_FOUND_MESSAGE = "User not found with ID: ";
+    private static final String EMAIL_NOT_FOUND_MESSAGE = "User not found with email: ";
+
     @Override
     @Transactional
     public List<CalendarUserDto> getCalendarUsers(int userId, int calendarId) {
         if (!calendarUserRepository.existsByUserProfileIdAndCalendarId(userId, calendarId)) {
-            throw new AccessDeniedException(
-                    "User with id: " + userId + " don't have access to calendar with id: " + calendarId);
+            throw new AccessDeniedException(ACCESS_DENIED_MESSAGE +
+                    "User with ID: " + userId + " doesn't have access to calendar with ID: " + calendarId);
         }
         return calendarUserRepository.getCalendarUserDtoListByUserIdAndCalendarId(calendarId);
     }
@@ -37,29 +40,53 @@ public class CalendarUserServiceImpl implements CalendarUserService {
     @Override
     @Transactional
     public CalendarUserInviteResponse inviteUserByEmail(int userId, int calendarId, String email) {
-        var calendarUser = calendarUserRepository.findByUserIdAndCalendarId(userId, calendarId)
-                .orElseThrow(() -> new AccessDeniedException(
-                        "User with id: " + userId + " don't have access to calendar with id: " + calendarId));
+        CalendarUser calendarUser = getCalendarUser(userId, calendarId);
 
-        var role = calendarUser.getCalendarRole();
+        CalendarRole role = calendarUser.getCalendarRole();
         if (role == CalendarRole.USER || role == CalendarRole.PENDING_INVITE) {
-            throw new AccessDeniedException("User don't have access to invite to this calendar");
+            throw new AccessDeniedException(ACCESS_DENIED_MESSAGE + "User doesn't have access to invite to this calendar");
         }
 
-        var calendar = calendarRepository.findById(calendarId)
-                .orElseThrow(() -> new EntityNotFoundException("Calendar with id: " + calendarId + " not found"));
-        var invitedUserProfile = userProfileRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("User with email: " + email + " not found"));
+        Calendar calendar = calendarRepository.findById(calendarId)
+                .orElseThrow(() -> new EntityNotFoundException(CALENDAR_NOT_FOUND_MESSAGE + calendarId));
 
-        var invitedCalendarUser = new CalendarUser();
+        UserProfile invitedUserProfile = userProfileRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException(EMAIL_NOT_FOUND_MESSAGE + email));
+
+        CalendarUser invitedCalendarUser = createInvitedCalendarUser(calendarId, invitedUserProfile, calendar);
+        calendarUserRepository.save(invitedCalendarUser);
+
+        return new CalendarUserInviteResponse(
+                invitedCalendarUser.getId().getUserId(), calendarId, "Invite sent");
+    }
+
+    @Override
+    @Transactional
+    public void deleteCalendarUser(int userId, int calendarId, int calendarUserId) {
+        CalendarUser calendarUser = getCalendarUser(userId, calendarId);
+        CalendarRole role = calendarUser.getCalendarRole();
+        if (role != CalendarRole.CREATOR && role != CalendarRole.EDITOR) {
+            throw new AccessDeniedException(ACCESS_DENIED_MESSAGE +
+                    "User doesn't have access to remove users from this calendar");
+        }
+
+        CalendarUser calendarUserToDelete = getCalendarUser(calendarUserId, calendarId);
+        calendarUserRepository.delete(calendarUserToDelete);
+    }
+
+    private CalendarUser getCalendarUser(int userId, int calendarId) {
+        return calendarUserRepository.findCalendarUserByUserIdAndCalendarId(userId, calendarId)
+                .orElseThrow(() -> new AccessDeniedException(ACCESS_DENIED_MESSAGE +
+                        "User with ID: " + userId + " doesn't have access to calendar with ID: " + calendarId));
+    }
+
+    private CalendarUser createInvitedCalendarUser(int calendarId, UserProfile invitedUserProfile, Calendar calendar) {
+        CalendarUser invitedCalendarUser = new CalendarUser();
         invitedCalendarUser.setId(new CalendarUserKey(invitedUserProfile.getId(), calendarId));
         invitedCalendarUser.setCalendar(calendar);
         invitedCalendarUser.setUserProfile(invitedUserProfile);
         invitedCalendarUser.setCalendarRole(CalendarRole.PENDING_INVITE);
         invitedCalendarUser.setIsCalendarActive(true);
-        invitedCalendarUser = calendarUserRepository.save(invitedCalendarUser);
-
-        return new CalendarUserInviteResponse(
-                invitedCalendarUser.getId().getUserId(), calendarId,"Invite sent");
+        return invitedCalendarUser;
     }
 }
