@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import ru.nfm.calendar.model.CalendarRole;
 
 public record CalendarUserDto(
+        @JsonProperty(access = JsonProperty.Access.READ_ONLY)
         int userId,
         String email,
         String firstName,

@@ -6,6 +6,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.nfm.calendar.dto.CalendarUserDto;
+import ru.nfm.calendar.mapper.CalendarUserMapper;
 import ru.nfm.calendar.model.*;
 import ru.nfm.calendar.payload.response.CalendarUserInviteResponse;
 import ru.nfm.calendar.repository.CalendarRepository;
@@ -18,9 +19,11 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class CalendarUserServiceImpl implements CalendarUserService {
+
     private final CalendarUserRepository calendarUserRepository;
     private final UserProfileRepository userProfileRepository;
     private final CalendarRepository calendarRepository;
+    private final CalendarUserMapper calendarUserMapper;
 
     private static final String ACCESS_DENIED_MESSAGE = "Access denied: ";
     private static final String CALENDAR_NOT_FOUND_MESSAGE = "Calendar not found with ID: ";
@@ -72,6 +75,34 @@ public class CalendarUserServiceImpl implements CalendarUserService {
 
         CalendarUser calendarUserToDelete = getCalendarUser(calendarUserId, calendarId);
         calendarUserRepository.delete(calendarUserToDelete);
+    }
+
+    @Override
+    @Transactional
+    public CalendarUserDto promoteUser(int userId, int calendarId, int calendarUserId) {
+        var calendarUser = getCalendarUser(userId, calendarId);
+        var role = calendarUser.getCalendarRole();
+        if (role != CalendarRole.CREATOR) {
+            throw new AccessDeniedException(ACCESS_DENIED_MESSAGE +
+                    "User don't have access to promote users in this calendar");
+        }
+        var promotedUser = getCalendarUser(calendarUserId, calendarId);
+        promotedUser.setCalendarRole(CalendarRole.EDITOR);
+        return calendarUserMapper.toDto(calendarUserRepository.save(promotedUser));
+    }
+
+    @Override
+    @Transactional
+    public CalendarUserDto demoteUser(int userId, int calendarId, int calendarUserId) {
+        var calendarUser = getCalendarUser(userId, calendarId);
+        var role = calendarUser.getCalendarRole();
+        if (role != CalendarRole.CREATOR) {
+            throw new AccessDeniedException(ACCESS_DENIED_MESSAGE +
+                    "User don't have access to demote users in this calendar");
+        }
+        var demotedUser = getCalendarUser(calendarUserId, calendarId);
+        demotedUser.setCalendarRole(CalendarRole.USER);
+        return calendarUserMapper.toDto(calendarUserRepository.save(demotedUser));
     }
 
     private CalendarUser getCalendarUser(int userId, int calendarId) {

@@ -1,10 +1,16 @@
 package ru.nfm.calendar.mapper;
 
 import org.mapstruct.Mapper;
-import ru.nfm.calendar.dto.CalendarDto;
-import ru.nfm.calendar.model.Calendar;
+import org.mapstruct.Mapping;
+import ru.nfm.calendar.dto.CalendarUserDto;
+import ru.nfm.calendar.model.CalendarUser;
 
 @Mapper(componentModel = "spring")
 public interface CalendarUserMapper {
-    CalendarDto toDto(Calendar calendar, boolean isActive);
+
+    @Mapping(target = "userId", source = "userProfile.id")
+    @Mapping(target = "firstName", source = "userProfile.firstName")
+    @Mapping(target = "lastName", source = "userProfile.lastName")
+    @Mapping(target = "email", source = "userProfile.user.email")
+    CalendarUserDto toDto(CalendarUser calendarUser);
 }

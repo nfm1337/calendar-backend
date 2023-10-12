@@ -39,4 +39,18 @@ public class CalendarUserController {
         calendarUserService.deleteCalendarUser(user.getId(), calendarId, userId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{userId}/promote")
+    public ResponseEntity<CalendarUserDto> promoteCalendarUser(@AuthenticationPrincipal User user,
+                                                               @PathVariable int calendarId,
+                                                               @PathVariable int userId) {
+        return ResponseEntity.ok(calendarUserService.promoteUser(user.getId(), calendarId, userId));
+    }
+
+    @PostMapping("/{userId}/demote")
+    public ResponseEntity<CalendarUserDto> denoteCalendarUser(@AuthenticationPrincipal User user,
+                                                              @PathVariable int calendarId,
+                                                              @PathVariable int userId) {
+        return ResponseEntity.ok(calendarUserService.demoteUser(user.getId(), calendarId, userId));
+    }
 }

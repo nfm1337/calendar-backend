@@ -15,4 +15,6 @@ public interface CalendarMapper {
     void updateCalendarFromDto(CalendarDto calendarDto, @MappingTarget Calendar calendar);
 
     CalendarDto toDto(Calendar calendar);
+
+    CalendarDto toDtoWithIsActive(Calendar calendar, boolean isActive);
 }

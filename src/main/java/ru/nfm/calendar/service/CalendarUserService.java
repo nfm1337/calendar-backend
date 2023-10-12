@@ -9,4 +9,6 @@ public interface CalendarUserService {
     List<CalendarUserDto> getCalendarUsers(int userId, int calendarId);
     CalendarUserInviteResponse inviteUserByEmail(int userId, int calendarId, String email);
     void deleteCalendarUser(int userId, int calendarId, int calendarUserId);
+    CalendarUserDto promoteUser(int userId, int calendarId, int calendarUserId);
+    CalendarUserDto demoteUser(int userId, int calendarId, int calendarUserId);
 }

@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.nfm.calendar.dto.CalendarDto;
 import ru.nfm.calendar.exception.UserNotFoundException;
 import ru.nfm.calendar.mapper.CalendarMapper;
-import ru.nfm.calendar.mapper.CalendarUserMapper;
 import ru.nfm.calendar.model.*;
 import ru.nfm.calendar.payload.request.CalendarRequest;
 import ru.nfm.calendar.payload.response.CalendarToggleActiveResponse;
@@ -29,7 +28,6 @@ public class CalendarServiceImpl implements CalendarService {
     private final UserProfileRepository userProfileRepository;
     private final CalendarUserRepository calendarUserRepository;
     private final CalendarMapper calendarMapper;
-    private final CalendarUserMapper calendarUserMapper;
 
     @Override
     @Transactional
@@ -66,7 +64,7 @@ public class CalendarServiceImpl implements CalendarService {
                 .orElseThrow(() -> new UserNotFoundException(user.getId(), "not found"));
 
         return userProfile.getCalendarUserList().stream()
-                .map(u -> calendarUserMapper.toDto(u.getCalendar(), u.getIsCalendarActive()))
+                .map(u -> calendarMapper.toDtoWithIsActive(u.getCalendar(), u.getIsCalendarActive()))
                 .toList();
     }
 
